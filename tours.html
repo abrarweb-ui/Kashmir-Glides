@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kashmir Tour Packages | Kashmir Glide Tour & Travels</title>
+<meta name="description" content="Explore premium Kashmir tour packages — Gulmarg gondola, Srinagar sightseeing, Pahalgam valley, Sonamarg glacier, honeymoon packages and more."/>
+<link rel="canonical" href="https://kashmirglide.com/tours.html"/>
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+.tour-filters{background:var(--white);border-radius:4px;padding:1.5rem 1.75rem;box-shadow:var(--shadow);display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:2.5rem}
+.filter-item{flex:1;min-width:140px}
+.filter-item label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--charcoal-light);margin-bottom:.35rem;font-weight:500}
+.filter-item select,.filter-item input{width:100%;padding:.6rem .85rem;border:1.5px solid rgba(44,44,44,.12);border-radius:var(--radius);background:var(--off-white);font-family:'Jost',sans-serif;font-size:.87rem;color:var(--charcoal);outline:none;transition:var(--transition)}
+.filter-item select:focus,.filter-item input:focus{border-color:var(--green)}
+@media(max-width:600px){.tour-filters{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="page-hero">
+  <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80')"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <h1>Tour Packages</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">›</span><span>Tour Packages</span></div>
+  </div>
+</div>
+
+<section>
+  <div class="section-inner">
+    <div class="tour-filters" data-reveal>
+      <div class="filter-item"><label>Search</label><input type="text" id="searchInput" placeholder="Search tours…"/></div>
+      <div class="filter-item"><label>Category</label>
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <option>Honeymoon</option><option>Family</option><option>Adventure</option>
+          <option>Pilgrimage</option><option>Group</option><option>Day Trip</option>
+        </select>
+      </div>
+      <div class="filter-item"><label>Budget (per person)</label>
+        <select id="budgetFilter">
+          <option value="">Any Budget</option>
+          <option value="5000">Under ₹5,000</option>
+          <option value="10000">Under ₹10,000</option>
+          <option value="20000">Under ₹20,000</option>
+          <option value="999999">₹20,000+</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-grid" id="toursGrid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+    <div id="toursMsg" style="text-align:center;padding:1rem;color:var(--charcoal-light);display:none"></div>
+  </div>
+</section>
+
+<div class="cta-banner">
+  <div class="cta-banner-inner">
+    <h2>Can't Find What You Need?</h2>
+    <p>We specialise in custom itineraries. Tell us your dates, group size and interests.</p>
+    <a href="contact.html" class="btn-gold">Request Custom Tour</a>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/layout.js"></script>
+<script src="js/utils.js"></script>
+<script>
+KG_LAYOUT.inject();
+KG.init();
+
+var TOURS = [
+  {id:'gulmarg',name:'Gulmarg Gondola Package',category:'Adventure',duration:'2 Days',groupSize:'2–10 Pax',price:3500,badge:'Bestseller',description:'Experience Asia\'s highest gondola cable car ride with breathtaking views of the Pir Panjal range. Snow, skiing, and serenity await.',image:'https://images.unsplash.com/photo-1577985759054-f2e0d6b90d55?w=600&q=80'},
+  {id:'honeymoon',name:'Srinagar Honeymoon Package',category:'Honeymoon',duration:'4 Days',groupSize:'Couples',price:12000,badge:'Romantic',description:'Floating markets, Dal Lake shikara rides at dawn, tulip gardens in full bloom — the perfect Kashmir honeymoon curated just for two.',image:'https://images.unsplash.com/photo-1586016413664-864c0dd76f53?w=600&q=80'},
+  {id:'pahalgam',name:'Pahalgam Valley Explorer',category:'Family',duration:'3 Days',groupSize:'Family',price:8500,badge:'Family',description:'Pine forests, Lidder river rapids, Baisaran meadows — a complete Pahalgam experience for nature lovers and adventure seekers.',image:'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600&q=80'},
+  {id:'sonamarg',name:'Sonamarg Glacier Trek',category:'Adventure',duration:'2 Days',groupSize:'2–8 Pax',price:5500,badge:'Scenic',description:'Trek across the Thajiwas glacier, spot mountain flowers, and camp under a sky full of stars in the meadow of gold.',image:'https://images.unsplash.com/photo-1626016741200-8e5f1d9a26a0?w=600&q=80'},
+  {id:'grand',name:'Kashmir Grand Tour (7N/8D)',category:'Group',duration:'8 Days',groupSize:'4–20 Pax',price:22000,badge:'Popular',description:'The complete Kashmir experience — Srinagar, Gulmarg, Pahalgam, Sonamarg, and Yusmarg. A journey through all of heaven\'s addresses.',image:'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=600&q=80'},
+  {id:'dal',name:'Dal Lake Day Package',category:'Day Trip',duration:'1 Day',groupSize:'All',price:1800,badge:'Quick',description:'A dawn-to-dusk exploration of Srinagar — shikara ride, floating market, Mughal gardens and Hazratbal mosque.',image:'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&q=80'},
+  {id:'amarnath',name:'Amarnath Yatra Package',category:'Pilgrimage',duration:'4 Days',groupSize:'Groups',price:7500,badge:'Sacred',description:'A spiritually enriching journey to the holy Amarnath cave shrine through scenic Pahalgam base camp route.',image:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80'},
+  {id:'winter',name:'Winter Wonderland Package',category:'Adventure',duration:'3 Days',groupSize:'2–8 Pax',price:9500,badge:'Winter',description:'Skiing in Gulmarg, igloo stays, snow sledging and hot kahwa by the fire — Kashmir in winter is pure magic.',image:'https://images.unsplash.com/photo-1537253803284-2c1991af0b67?w=600&q=80'},
+  {id:'family7',name:'Family Kashmir Special (5N/6D)',category:'Family',duration:'6 Days',groupSize:'Family',price:18000,badge:'Recommended',description:'A perfectly paced family tour covering Srinagar sightseeing, Gulmarg cable car, Pahalgam meadows and Sonamarg glacier.',image:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80'},
+];
+
+var allTours = TOURS.slice();
+var filtered = allTours.slice();
+
+function renderTours() {
+  var grid = document.getElementById('toursGrid');
+  var msg = document.getElementById('toursMsg');
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    msg.style.display = 'block';
+    msg.innerHTML = '<div style="padding:3rem"><h3 style="font-family:Cormorant Garamond,serif;font-size:1.5rem;margin-bottom:.5rem">No tours found</h3><p>Try adjusting your filters or <a href="contact.html" style="color:var(--green)">contact us</a> for a custom package.</p></div>';
+    return;
+  }
+  msg.style.display = 'none';
+  grid.innerHTML = filtered.map(function(t, i) {
+    return '<div class="card" data-reveal data-reveal-delay="'+((i%3)+1)+'">' +
+      '<div class="card-img"><img src="'+t.image+'" alt="'+t.name+'" loading="lazy"/>'+(t.badge?'<span class="card-badge">'+t.badge+'</span>':'')+'</div>' +
+      '<div class="card-body"><h3>'+t.name+'</h3>' +
+      '<div class="card-meta"><span>📅 '+t.duration+'</span><span>👥 '+t.groupSize+'</span><span>🏷️ '+t.category+'</span></div>' +
+      '<p>'+t.description.substring(0,130)+'…</p>' +
+      '<div class="card-price"><div><div class="price-from">Starting from</div><div class="price-value">₹'+t.price.toLocaleString('en-IN')+'</div></div>' +
+      '<a href="book.html?tour='+encodeURIComponent(t.name)+'" class="btn-sm">Book Now</a></div>' +
+      '</div></div>';
+  }).join('');
+  KG.initScrollReveal();
+}
+
+function applyFilters() {
+  var search = document.getElementById('searchInput').value.toLowerCase();
+  var cat = document.getElementById('categoryFilter').value;
+  var budget = parseInt(document.getElementById('budgetFilter').value) || 0;
+  filtered = allTours.filter(function(t) {
+    if (search && t.name.toLowerCase().indexOf(search) === -1 && t.description.toLowerCase().indexOf(search) === -1) return false;
+    if (cat && t.category !== cat) return false;
+    if (budget && t.price > budget) return false;
+    return true;
+  });
+  renderTours();
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+document.getElementById('budgetFilter').addEventListener('change', applyFilters);
+
+// Try Firestore first
+(function() {
+  var cfg = window.KG && window.KG.firebaseConfig;
+  if (!cfg || cfg.apiKey === 'YOUR_API_KEY') { renderTours(); return; }
+  var s1 = document.createElement('script'); s1.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
+  s1.onload = function() {
+    var s2 = document.createElement('script'); s2.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js';
+    s2.onload = function() {
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(cfg);
+        firebase.firestore().collection('tours').orderBy('createdAt','desc').get().then(function(snap) {
+          if (!snap.empty) {
+            allTours = [];
+            snap.forEach(function(d) { allTours.push(Object.assign({id:d.id},d.data())); });
+            filtered = allTours.slice();
+          }
+          renderTours();
+        }).catch(function() { renderTours(); });
+      } catch(e) { renderTours(); }
+    };
+    s2.onerror = function() { renderTours(); };
+    document.head.appendChild(s2);
+  };
+  s1.onerror = function() { renderTours(); };
+  document.head.appendChild(s1);
+})();
+</script>
+</body>
+</html>

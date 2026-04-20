@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kashmir Travel Gallery | Kashmir Glide Tour & Travels</title>
+<meta name="description" content="Browse stunning photos from our Kashmir tours — Gulmarg snow, Dal Lake shikaras, Pahalgam valleys, Sonamarg glaciers and more."/>
+<link rel="canonical" href="https://kashmirglide.com/gallery.html"/>
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+.masonry-grid{columns:4;column-gap:.75rem}
+.masonry-item{break-inside:avoid;margin-bottom:.75rem;overflow:hidden;border-radius:4px;cursor:pointer;position:relative}
+.masonry-item img{width:100%;display:block;transition:transform .5s ease}
+.masonry-item:hover img{transform:scale(1.05)}
+.masonry-item .overlay{position:absolute;inset:0;background:rgba(29,54,16,0);transition:.3s;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;opacity:0}
+.masonry-item:hover .overlay{background:rgba(29,54,16,.35);opacity:1}
+.cat-filters{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem}
+.cat-btn{padding:.45rem 1.1rem;border:1.5px solid rgba(44,44,44,.15);border-radius:100px;font-size:.8rem;cursor:pointer;transition:var(--transition);background:var(--white);font-family:'Jost',sans-serif;color:var(--charcoal-light)}
+.cat-btn.active,.cat-btn:hover{background:var(--green);border-color:var(--green);color:var(--white)}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s}
+.lightbox.open{opacity:1;pointer-events:all}
+.lightbox img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:4px}
+.lb-close{position:absolute;top:1.5rem;right:1.5rem;color:white;font-size:2rem;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.1)}
+.lb-close:hover{background:rgba(255,255,255,.2)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);color:white;font-size:2.5rem;cursor:pointer;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.1)}
+.lb-nav:hover{background:rgba(255,255,255,.2)}
+.lb-prev{left:1.5rem}.lb-next{right:1.5rem}
+@media(max-width:900px){.masonry-grid{columns:3}}
+@media(max-width:600px){.masonry-grid{columns:2}}
+@media(max-width:400px){.masonry-grid{columns:1}}
+</style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+<div class="page-hero">
+  <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80')"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content"><h1>Gallery</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">›</span><span>Gallery</span></div>
+  </div>
+</div>
+<section>
+  <div class="section-inner">
+    <div class="section-header" data-reveal>
+      <div class="section-label">Visual Stories</div>
+      <h2 class="section-heading">Kashmir Through <span>Our Lens</span></h2>
+    </div>
+    <div class="cat-filters" data-reveal>
+      <button class="cat-btn active" data-cat="all">All Photos</button>
+      <button class="cat-btn" data-cat="gulmarg">Gulmarg</button>
+      <button class="cat-btn" data-cat="pahalgam">Pahalgam</button>
+      <button class="cat-btn" data-cat="sonamarg">Sonamarg</button>
+      <button class="cat-btn" data-cat="dal-lake">Dal Lake</button>
+      <button class="cat-btn" data-cat="winter">Winter</button>
+    </div>
+    <div class="masonry-grid" id="galleryGrid"></div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox">
+  <div class="lb-close" id="lbClose">✕</div>
+  <div class="lb-nav lb-prev" id="lbPrev">‹</div>
+  <img id="lbImg" src="" alt="Kashmir"/>
+  <div class="lb-nav lb-next" id="lbNext">›</div>
+</div>
+
+<div class="cta-banner">
+  <div class="cta-banner-inner">
+    <h2>Your Photos Could Be <em>Here</em></h2>
+    <p>Book a tour with us and become part of our Kashmir story gallery.</p>
+    <a href="book.html" class="btn-gold">Plan Your Trip</a>
+  </div>
+</div>
+<div id="footer-placeholder"></div>
+<script src="js/layout.js"></script><script src="js/utils.js"></script>
+<script>
+KG_LAYOUT.inject();
+KG.init();
+
+var PHOTOS = [
+  {url:'https://images.unsplash.com/photo-1577985759054-f2e0d6b90d55?w=600&q=80',cat:'gulmarg',alt:'Gulmarg Snow'},
+  {url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',cat:'sonamarg',alt:'Mountain Peak'},
+  {url:'https://images.unsplash.com/photo-1586016413664-864c0dd76f53?w=600&q=80',cat:'dal-lake',alt:'Dal Lake Shikara'},
+  {url:'https://images.unsplash.com/photo-1599661046289-e31897846e41?w=600&q=80',cat:'pahalgam',alt:'Pahalgam Valley'},
+  {url:'https://images.unsplash.com/photo-1626016741200-8e5f1d9a26a0?w=600&q=80',cat:'sonamarg',alt:'Sonamarg Glacier'},
+  {url:'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&q=80',cat:'gulmarg',alt:'Forest Snow'},
+  {url:'https://images.unsplash.com/photo-1531259683007-016a7b628fc3?w=600&q=80',cat:'gulmarg',alt:'Gulmarg Winter'},
+  {url:'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80',cat:'dal-lake',alt:'Dal Lake Sunset'},
+  {url:'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80',cat:'pahalgam',alt:'Mountain Drive'},
+  {url:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',cat:'sonamarg',alt:'Valley Meadow'},
+  {url:'https://images.unsplash.com/photo-1537253803284-2c1991af0b67?w=600&q=80',cat:'winter',alt:'Snow Landscape'},
+  {url:'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&q=80',cat:'winter',alt:'Snowy Pine Trees'},
+  {url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',cat:'sonamarg',alt:'Mountain Trail'},
+  {url:'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80',cat:'winter',alt:'Night Sky'},
+  {url:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80',cat:'pahalgam',alt:'Camping'},
+  {url:'https://images.unsplash.com/photo-1545389336-cf090694435e?w=600&q=80',cat:'dal-lake',alt:'Lake Reflection'},
+];
+
+var filtered = PHOTOS.slice();
+var lbIdx = 0;
+
+function renderGallery() {
+  var grid = document.getElementById('galleryGrid');
+  grid.innerHTML = filtered.map(function(p, i) {
+    return '<div class="masonry-item" data-idx="'+i+'"><img src="'+p.url+'" alt="'+p.alt+'" loading="lazy"/><div class="overlay">🔍</div></div>';
+  }).join('');
+  grid.querySelectorAll('.masonry-item').forEach(function(el) {
+    el.addEventListener('click', function() { openLB(parseInt(el.dataset.idx)); });
+  });
+}
+
+function openLB(idx) {
+  lbIdx = idx;
+  document.getElementById('lbImg').src = filtered[idx].url;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLB() { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('lbClose').onclick = closeLB;
+document.getElementById('lbPrev').onclick = function() { lbIdx = (lbIdx - 1 + filtered.length) % filtered.length; document.getElementById('lbImg').src = filtered[lbIdx].url; };
+document.getElementById('lbNext').onclick = function() { lbIdx = (lbIdx + 1) % filtered.length; document.getElementById('lbImg').src = filtered[lbIdx].url; };
+document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLB(); });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLB();
+  if (e.key === 'ArrowLeft') document.getElementById('lbPrev').click();
+  if (e.key === 'ArrowRight') document.getElementById('lbNext').click();
+});
+
+document.querySelectorAll('.cat-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    var cat = btn.dataset.cat;
+    filtered = cat === 'all' ? PHOTOS.slice() : PHOTOS.filter(function(p) { return p.cat === cat; });
+    renderGallery();
+  });
+});
+
+renderGallery();
+</script>
+</body>
+</html>
