@@ -146,6 +146,14 @@ tr:hover td{background:#fdfcfb}
       </div>
     </div>
 
+    <!-- DESTINATIONS -->
+    <div class="tab" id="tab-destinations">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>Destinations</h3><button class="btn-sm" onclick="openModal('destination')">+ Add</button></div>
+        <div class="tbl-scroll"><table><thead><tr><th>Img</th><th>Name</th><th>Altitude</th><th>Best Season</th><th>Actions</th></tr></thead><tbody id="destinationsBody"></tbody></table></div>
+      </div>
+    </div>
+
     <!-- VEHICLES -->
     <div class="tab" id="tab-vehicles">
       <div class="tbl-wrap">
@@ -208,37 +216,37 @@ tr:hover td{background:#fdfcfb}
 <script>
 // ⚠️ REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
 var firebaseConfig = {
- apiKey: "AIzaSyCdcQ9Rl4kxCJPeXIiRSdhB0rGN0OlmQAw",
-  authDomain: "kashmir-glides.firebaseapp.com",
-  projectId: "kashmir-glides",
-  storageBucket: "kashmir-glides.firebasestorage.app",
-  messagingSenderId: "542165837541",
-  appId: "1:542165837541:web:aecbc8801b1b943a10d60c"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 var auth = firebase.auth();
 
-// ── AUTH ───────────────────────────────────────────────
+// ── AUTH ────────────────────────────────────────────────
 auth.onAuthStateChanged(function(user) {
   if (user) {
     document.getElementById('loginView').style.display = 'none';
-    document.getElementById('dashView').style.display = 'flex';
-    document.getElementById('userEmail').textContent = '👤 ' + user.email;
+    document.getElementById('dashView').style.display  = 'flex';
+    document.getElementById('userEmail').textContent   = '👤 ' + user.email;
     loadOverview();
   } else {
     document.getElementById('loginView').style.display = 'flex';
-    document.getElementById('dashView').style.display = 'none';
+    document.getElementById('dashView').style.display  = 'none';
   }
 });
 
 document.getElementById('loginBtn').addEventListener('click', function() {
   var email = document.getElementById('lemail').value.trim();
-  var pwd = document.getElementById('lpwd').value;
-  var msg = document.getElementById('loginMsg');
+  var pwd   = document.getElementById('lpwd').value;
+  var msg   = document.getElementById('loginMsg');
   if (!email || !pwd) { msg.innerHTML = '<div class="alert alert-error">Enter email and password.</div>'; return; }
-  var btn = document.getElementById('loginBtn');
+  var btn   = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'Signing in…';
   auth.signInWithEmailAndPassword(email, pwd).catch(function() {
     msg.innerHTML = '<div class="alert alert-error">Invalid credentials. Please try again.</div>';
@@ -250,12 +258,16 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
   if (confirm('Sign out?')) auth.signOut();
 });
 
-// ── TABS ───────────────────────────────────────────────
-var TAB_TITLES = {overview:'Overview',tours:'Tour Packages',destinations:'Destinations',vehicles:'Vehicles',gallery:'Gallery',testimonials:'Testimonials',bookings:'All Bookings',contacts:'Contact Messages'};
+// ── TABS ─────────────────────────────────────────────────
+var TAB_TITLES = {
+  overview:'Overview', tours:'Tour Packages', destinations:'Destinations',
+  vehicles:'Vehicles', gallery:'Gallery', testimonials:'Testimonials',
+  bookings:'All Bookings', contacts:'Contact Messages'
+};
 
 function switchTab(name) {
-  document.querySelectorAll('.sb-btn[data-tab]').forEach(function(b) { b.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.sb-btn[data-tab]').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   var btn = document.querySelector('.sb-btn[data-tab="'+name+'"]');
   if (btn) btn.classList.add('active');
   var tab = document.getElementById('tab-'+name);
@@ -268,149 +280,446 @@ document.querySelectorAll('.sb-btn[data-tab]').forEach(function(btn) {
   btn.addEventListener('click', function() { switchTab(btn.dataset.tab); });
 });
 
-// ── OVERVIEW ───────────────────────────────────────────
+// ── OVERVIEW ─────────────────────────────────────────────
 function loadOverview() {
-  [['bookings','s-bookings'],['contacts','s-contacts'],['tours','s-tours'],['vehicles','s-vehicles']].forEach(function(pair) {
-    db.collection(pair[0]).get().then(function(s) { document.getElementById(pair[1]).textContent = s.size; }).catch(function(){});
+  [['bookings','s-bookings'],['contacts','s-contacts'],['tours','s-tours'],['vehicles','s-vehicles']].forEach(function(p) {
+    db.collection(p[0]).get()
+      .then(function(s){ document.getElementById(p[1]).textContent = s.size; })
+      .catch(function(){ document.getElementById(p[1]).textContent = '—'; });
   });
   db.collection('bookings').orderBy('createdAt','desc').limit(5).get().then(function(s) {
     document.getElementById('recentBookings').innerHTML = s.empty
       ? '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--charcoal-light)">No bookings yet.</td></tr>'
-      : s.docs.map(function(d){var b=d.data();return '<tr><td><strong>'+b.name+'</strong></td><td><a href="tel:'+b.phone+'" style="color:var(--green)">'+b.phone+'</a></td><td>'+(b.tour||'—')+'</td><td>'+(b.travelDate||'—')+'</td><td><span class="sb sb-'+(b.status||'pending')+'">'+(b.status||'pending')+'</span></td></tr>';}).join('');
+      : s.docs.map(function(d){
+          var b = d.data();
+          return '<tr><td><strong>'+(b.name||'—')+'</strong></td>'
+            +'<td><a href="tel:'+(b.phone||'')+'" style="color:var(--green)">'+(b.phone||'—')+'</a></td>'
+            +'<td>'+(b.tour||'—')+'</td>'
+            +'<td>'+(b.travelDate||'—')+'</td>'
+            +'<td><span class="sb sb-'+(b.status||'pending')+'">'+(b.status||'pending')+'</span></td></tr>';
+        }).join('');
   }).catch(function(){});
   db.collection('contacts').orderBy('createdAt','desc').limit(5).get().then(function(s) {
     document.getElementById('recentContacts').innerHTML = s.empty
       ? '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--charcoal-light)">No messages yet.</td></tr>'
-      : s.docs.map(function(d){var c=d.data();return '<tr><td><strong>'+c.name+'</strong></td><td>'+c.phone+'</td><td>'+(c.subject||'—')+'</td><td><span class="sb sb-'+(c.status||'new')+'">'+(c.status||'new')+'</span></td></tr>';}).join('');
+      : s.docs.map(function(d){
+          var c2 = d.data();
+          return '<tr><td><strong>'+(c2.name||'—')+'</strong></td>'
+            +'<td>'+(c2.phone||'—')+'</td>'
+            +'<td>'+(c2.subject||'—')+'</td>'
+            +'<td><span class="sb sb-'+(c2.status||'new')+'">'+(c2.status||'new')+'</span></td></tr>';
+        }).join('');
   }).catch(function(){});
 }
 
-// ── TABLE LOADER ───────────────────────────────────────
+// ── TABLE LOADER ─────────────────────────────────────────
 function loadTable(col) {
   var tbId = col + 'Body';
-  var tb = document.getElementById(tbId);
+  var tb   = document.getElementById(tbId);
   if (!tb) return;
-  tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem"><div class="spinner" style="margin:0 auto;width:28px;height:28px;border:3px solid var(--cream);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite"></div></td></tr>';
-  db.collection(col).orderBy('createdAt','desc').get().then(function(snap) {
-    if (snap.empty) { tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:var(--charcoal-light)">No '+col+' found. Click + Add above to create one.</td></tr>'; return; }
-    tb.innerHTML = snap.docs.map(function(d) { return buildRow(col, d.id, d.data()); }).join('');
-  }).catch(function() { tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:#b43232">⚠ Failed to load. Check your Firestore rules.</td></tr>'; });
-}
-
-function buildRow(col, id, d) {
-  var img = (d.image||d.url) ? '<td><img src="'+(d.image||d.url)+'" class="ti" alt="" onerror="this.style.display=\'none\'"/></td>' : '<td>—</td>';
-  var eb = '<button class="bi bi-edit" onclick="editItem(\''+col+'\',\''+id+'\')">✏️</button>';
-  var db_ = '<button class="bi bi-del" onclick="delItem(\''+col+'\',\''+id+'\')">🗑️</button>';
-  var tr = function(s,n){return String(s||'—').length>n?String(s).substring(0,n)+'…':String(s||'—');};
-  if (col==='tours') return '<tr>'+img+'<td><strong>'+d.name+'</strong></td><td>'+(d.category||'—')+'</td><td><strong style="color:var(--green)">₹'+Number(d.price||0).toLocaleString('en-IN')+'</strong></td><td>'+(d.duration||'—')+'</td><td>'+(d.badge?'<span class="sb sb-confirmed">'+d.badge+'</span>':'—')+'</td><td>'+eb+db_+'</td></tr>';
-  if (col==='destinations') return '<tr>'+img+'<td><strong>'+d.name+'</strong></td><td>'+(d.altitude||'—')+'</td><td>'+(d.bestSeason||'—')+'</td><td>'+eb+db_+'</td></tr>';
-  if (col==='vehicles') return '<tr>'+img+'<td><strong>'+d.name+'</strong></td><td>'+(d.capacity||'—')+'</td><td>'+(d.badge?'<span class="sb sb-confirmed">'+d.badge+'</span>':'—')+'</td><td>'+eb+db_+'</td></tr>';
-  if (col==='gallery') return '<tr>'+img+'<td>'+(d.caption||'—')+'</td><td><span class="sb sb-new">'+(d.category||'—')+'</span></td><td>'+eb+db_+'</td></tr>';
-  if (col==='testimonials') return '<tr><td><strong>'+(d.author||'—')+'</strong></td><td>'+(d.location||'—')+'</td><td>'+'★'.repeat(Math.min(5,parseInt(d.rating)||5))+'</td><td><span class="oc">'+tr(d.review,60)+'</span></td><td>'+eb+db_+'</td></tr>';
-  if (col==='bookings') {
-    var ss = '<select class="ss" onchange="updStatus(\'bookings\',\''+id+'\',this.value)"><option value="pending"'+(d.status==='pending'?' selected':'')+'>Pending</option><option value="confirmed"'+(d.status==='confirmed'?' selected':'')+'>Confirmed</option><option value="cancelled"'+(d.status==='cancelled'?' selected':'')+'>Cancelled</option></select>';
-    return '<tr><td><strong>'+d.name+'</strong></td><td><a href="tel:'+d.phone+'" style="color:var(--green)">'+d.phone+'</a></td><td>'+(d.tour||'—')+'</td><td>'+(d.travelDate||'—')+'</td><td>'+(d.adults||'—')+'</td><td>'+(d.vehicle||'—')+'</td><td>'+ss+'</td><td>'+db_+'</td></tr>';
-  }
-  if (col==='contacts') {
-    var mrb = d.status!=='read' ? '<button class="bi bi-edit" title="Mark Read" onclick="markRead(\''+id+'\')">✓</button>' : '';
-    return '<tr><td><strong>'+d.name+'</strong></td><td><a href="tel:'+d.phone+'" style="color:var(--green)">'+d.phone+'</a></td><td>'+(d.email||'—')+'</td><td>'+(d.subject||'—')+'</td><td><span class="oc">'+tr(d.message,55)+'</span></td><td><span class="sb sb-'+(d.status||'new')+'">'+(d.status||'new')+'</span></td><td>'+mrb+db_+'</td></tr>';
-  }
-  return '<tr><td colspan="10">'+JSON.stringify(d).substring(0,100)+'</td></tr>';
-}
-
-window.updStatus = function(col,id,val) { db.collection(col).doc(id).update({status:val}).catch(function(){}); };
-window.markRead = function(id) { db.collection('contacts').doc(id).update({status:'read'}).then(function(){loadTable('contacts');}); };
-window.delItem = function(col,id) {
-  if (!confirm('Delete this item? This cannot be undone.')) return;
-  db.collection(col).doc(id).delete().then(function(){loadTable(col);}).catch(function(){alert('Delete failed.');});
-};
-
-// ── MODAL ──────────────────────────────────────────────
-var FORMS = {
-  tour:'<div class="form-group"><label>Tour Name *</label><input class="form-control" id="f_name" placeholder="e.g. Gulmarg Gondola Package"/></div><div class="form-row"><div class="form-group"><label>Category</label><select class="form-control" id="f_category"><option>Adventure</option><option>Honeymoon</option><option>Family</option><option>Group</option><option>Day Trip</option><option>Pilgrimage</option></select></div><div class="form-group"><label>Price (₹) *</label><input class="form-control" id="f_price" type="number" placeholder="3500"/></div></div><div class="form-row"><div class="form-group"><label>Duration</label><input class="form-control" id="f_duration" placeholder="2 Days"/></div><div class="form-group"><label>Group Size</label><input class="form-control" id="f_groupSize" placeholder="2–10 Pax"/></div></div><div class="form-group"><label>Badge</label><input class="form-control" id="f_badge" placeholder="Bestseller, New…"/></div><div class="form-group"><label>Image URL</label><input class="form-control" id="f_image" placeholder="https://images.unsplash.com/…"/></div><div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="3"></textarea></div>',
-  destination:'<div class="form-group"><label>Destination Name *</label><input class="form-control" id="f_name"/></div><div class="form-row"><div class="form-group"><label>Altitude</label><input class="form-control" id="f_altitude" placeholder="2,650 m"/></div><div class="form-group"><label>Best Season</label><input class="form-control" id="f_bestSeason" placeholder="Dec–Mar"/></div></div><div class="form-group"><label>Image URL</label><input class="form-control" id="f_image"/></div><div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="3"></textarea></div>',
-  vehicle:'<div class="form-group"><label>Vehicle Name *</label><input class="form-control" id="f_name" placeholder="Toyota Innova Crysta"/></div><div class="form-row"><div class="form-group"><label>Capacity</label><input class="form-control" id="f_capacity" placeholder="6–7 Seats"/></div><div class="form-group"><label>Badge</label><input class="form-control" id="f_badge" placeholder="Premium…"/></div></div><div class="form-group"><label>Specs (comma separated)</label><input class="form-control" id="f_specsRaw" placeholder="AC, GPS, Music"/></div><div class="form-group"><label>Image URL</label><input class="form-control" id="f_image"/></div><div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="3"></textarea></div>',
-  gallery:'<div class="form-group"><label>Image URL *</label><input class="form-control" id="f_url" placeholder="https://images.unsplash.com/…"/></div><div class="form-row"><div class="form-group"><label>Caption</label><input class="form-control" id="f_caption"/></div><div class="form-group"><label>Category</label><select class="form-control" id="f_category"><option value="gulmarg">Gulmarg</option><option value="pahalgam">Pahalgam</option><option value="sonamarg">Sonamarg</option><option value="dal-lake">Dal Lake</option><option value="winter">Winter</option><option value="all">General</option></select></div></div>',
-  testimonial:'<div class="form-row"><div class="form-group"><label>Author Name *</label><input class="form-control" id="f_author"/></div><div class="form-group"><label>Location / Package</label><input class="form-control" id="f_location" placeholder="Delhi · Honeymoon"/></div></div><div class="form-row"><div class="form-group"><label>Rating (1–5)</label><input class="form-control" id="f_rating" type="number" min="1" max="5" value="5"/></div><div class="form-group"><label>Avatar URL</label><input class="form-control" id="f_avatar"/></div></div><div class="form-group"><label>Review Text *</label><textarea class="form-control" id="f_review" rows="4"></textarea></div>'
-};
-
-var _mType = null, _mEditId = null, _mEditCol = null;
-
-function openModal(type, data) {
-  _mType = type; _mEditId = null; _mEditCol = null;
-  document.getElementById('moTitle').textContent = 'Add ' + type.charAt(0).toUpperCase() + type.slice(1);
-  document.getElementById('moBody').innerHTML = FORMS[type] || '';
-  if (data) {
-    Object.keys(data).forEach(function(k) {
-      var el = document.getElementById('f_'+k);
-      if (el) el.value = data[k] !== undefined ? data[k] : '';
+  tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem">'
+    +'<div style="width:28px;height:28px;border:3px solid var(--cream);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div>'
+    +'</td></tr>';
+  db.collection(col).orderBy('createdAt','desc').get()
+    .then(function(snap) {
+      if (snap.empty) {
+        tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:var(--charcoal-light)">'
+          +'No '+col+' yet — click <strong>+ Add</strong> to create one.</td></tr>';
+        return;
+      }
+      tb.innerHTML = snap.docs.map(function(d){ return buildRow(col, d.id, d.data()); }).join('');
+    })
+    .catch(function(err) {
+      tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:#b43232">'
+        +'⚠ Failed to load. Check Firestore rules. ('+err.message+')</td></tr>';
     });
-    if (data.specs && Array.isArray(data.specs)) {
-      var sp = document.getElementById('f_specsRaw');
-      if (sp) sp.value = data.specs.join(', ');
+}
+
+// ── ROW BUILDER ──────────────────────────────────────────
+function buildRow(col, id, d) {
+  var imgSrc = d.image || d.url || '';
+  var imgCell = imgSrc
+    ? '<td><img src="'+imgSrc+'" class="ti" alt="" onerror="this.style.display=\'none\'"/></td>'
+    : '<td style="color:var(--charcoal-light);font-size:.8rem">No img</td>';
+  var eb  = '<button class="bi bi-edit" title="Edit"   onclick="editItem(\''+col+'\',\''+id+'\')">✏️</button>';
+  var db_ = '<button class="bi bi-del"  title="Delete" onclick="delItem(\''+col+'\',\''+id+'\')">🗑️</button>';
+  var tr  = function(s,n){ s=String(s||'—'); return s.length>n ? s.substring(0,n)+'…' : s; };
+
+  switch(col) {
+    case 'tours':
+      return '<tr>'+imgCell
+        +'<td><strong>'+(d.name||'—')+'</strong></td>'
+        +'<td>'+(d.category||'—')+'</td>'
+        +'<td><strong style="color:var(--green)">₹'+Number(d.price||0).toLocaleString('en-IN')+'</strong></td>'
+        +'<td>'+(d.duration||'—')+'</td>'
+        +'<td>'+(d.badge?'<span class="sb sb-confirmed">'+d.badge+'</span>':'—')+'</td>'
+        +'<td>'+eb+db_+'</td></tr>';
+
+    case 'destinations':
+      return '<tr>'+imgCell
+        +'<td><strong>'+(d.name||'—')+'</strong></td>'
+        +'<td>'+(d.altitude||'—')+'</td>'
+        +'<td>'+(d.bestSeason||'—')+'</td>'
+        +'<td>'+eb+db_+'</td></tr>';
+
+    case 'vehicles':
+      return '<tr>'+imgCell
+        +'<td><strong>'+(d.name||'—')+'</strong></td>'
+        +'<td>'+(d.capacity||'—')+'</td>'
+        +'<td>'+(d.badge?'<span class="sb sb-confirmed">'+d.badge+'</span>':'—')+'</td>'
+        +'<td>'+eb+db_+'</td></tr>';
+
+    case 'gallery':
+      return '<tr>'+imgCell
+        +'<td>'+(d.caption||'—')+'</td>'
+        +'<td><span class="sb sb-new">'+(d.category||'all')+'</span></td>'
+        +'<td>'+eb+db_+'</td></tr>';
+
+    case 'testimonials':
+      return '<tr>'
+        +'<td><strong>'+(d.author||'—')+'</strong></td>'
+        +'<td>'+(d.location||'—')+'</td>'
+        +'<td>'+'★'.repeat(Math.min(5,parseInt(d.rating)||5))+'</td>'
+        +'<td><span style="display:block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+tr(d.review,70)+'</span></td>'
+        +'<td>'+eb+db_+'</td></tr>';
+
+    case 'bookings': {
+      var ss = '<select class="ss" onchange="updStatus(\'bookings\',\''+id+'\',this.value)">'
+        +'<option value="pending"'+(d.status==='pending'?' selected':'')+'>Pending</option>'
+        +'<option value="confirmed"'+(d.status==='confirmed'?' selected':'')+'>Confirmed</option>'
+        +'<option value="cancelled"'+(d.status==='cancelled'?' selected':'')+'>Cancelled</option>'
+        +'</select>';
+      return '<tr>'
+        +'<td><strong>'+(d.name||'—')+'</strong></td>'
+        +'<td><a href="tel:'+(d.phone||'')+'" style="color:var(--green)">'+(d.phone||'—')+'</a></td>'
+        +'<td>'+(d.tour||'—')+'</td>'
+        +'<td>'+(d.travelDate||'—')+'</td>'
+        +'<td>'+(d.adults||'—')+'</td>'
+        +'<td>'+(d.vehicle||'—')+'</td>'
+        +'<td>'+ss+'</td>'
+        +'<td>'+db_+'</td></tr>';
     }
+    case 'contacts': {
+      var mrb = (d.status !== 'read')
+        ? '<button class="bi bi-edit" title="Mark Read" onclick="markRead(\''+id+'\')">✓</button>'
+        : '';
+      return '<tr>'
+        +'<td><strong>'+(d.name||'—')+'</strong></td>'
+        +'<td><a href="tel:'+(d.phone||'')+'" style="color:var(--green)">'+(d.phone||'—')+'</a></td>'
+        +'<td>'+(d.email||'—')+'</td>'
+        +'<td>'+(d.subject||'—')+'</td>'
+        +'<td><span style="display:block;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+tr(d.message,55)+'</span></td>'
+        +'<td><span class="sb sb-'+(d.status||'new')+'">'+(d.status||'new')+'</span></td>'
+        +'<td>'+mrb+db_+'</td></tr>';
+    }
+    default:
+      return '<tr><td colspan="10">'+JSON.stringify(d).substring(0,120)+'</td></tr>';
   }
+}
+
+window.updStatus = function(col,id,val) {
+  db.collection(col).doc(id).update({status:val}).catch(function(){ alert('Status update failed.'); });
+};
+window.markRead = function(id) {
+  db.collection('contacts').doc(id).update({status:'read'})
+    .then(function(){ loadTable('contacts'); })
+    .catch(function(){});
+};
+window.delItem = function(col,id) {
+  if (!confirm('Delete this item permanently? This cannot be undone.')) return;
+  db.collection(col).doc(id).delete()
+    .then(function(){ showToast('Deleted!','success'); loadTable(col); })
+    .catch(function(){ alert('Delete failed. Check Firestore rules.'); });
+};
+
+// ── MODAL FORMS ──────────────────────────────────────────
+var FORMS = {
+  tour: [
+    '<div class="form-group"><label>Tour Name *</label><input class="form-control" id="f_name" placeholder="e.g. Gulmarg Gondola Package"/></div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Category</label><select class="form-control" id="f_category">',
+        '<option>Adventure</option><option>Honeymoon</option><option>Family</option>',
+        '<option>Group</option><option>Day Trip</option><option>Pilgrimage</option>',
+      '</select></div>',
+      '<div class="form-group"><label>Price (₹) *</label><input class="form-control" id="f_price" type="number" placeholder="3500"/></div>',
+    '</div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Duration</label><input class="form-control" id="f_duration" placeholder="2 Days"/></div>',
+      '<div class="form-group"><label>Group Size</label><input class="form-control" id="f_groupSize" placeholder="2–10 Pax"/></div>',
+    '</div>',
+    '<div class="form-group"><label>Badge <small style="font-weight:400;text-transform:none">(optional)</small></label><input class="form-control" id="f_badge" placeholder="Bestseller, New, Popular…"/></div>',
+    '<div class="form-group"><label>Image URL</label><input class="form-control" id="f_image" placeholder="https://images.unsplash.com/photo-…"/></div>',
+    '<div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="4" placeholder="Tour highlights and key details…"></textarea></div>',
+  ].join(''),
+
+  destination: [
+    '<div class="form-group"><label>Destination Name *</label><input class="form-control" id="f_name" placeholder="e.g. Gulmarg"/></div>',
+    '<div class="form-group"><label>Tagline <small style="font-weight:400;text-transform:none">(shown in heading)</small></label><input class="form-control" id="f_tagline" placeholder="Meadow of Flowers"/></div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Altitude</label><input class="form-control" id="f_altitude" placeholder="2,650 m"/></div>',
+      '<div class="form-group"><label>Distance from Tangmarg</label><input class="form-control" id="f_distance" placeholder="28 km"/></div>',
+    '</div>',
+    '<div class="form-group"><label>Best Season</label><input class="form-control" id="f_bestSeason" placeholder="Dec–Mar, Apr–Jun"/></div>',
+    '<div class="form-group"><label>Image URL</label><input class="form-control" id="f_image" placeholder="https://images.unsplash.com/photo-…"/></div>',
+    '<div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="4"></textarea></div>',
+  ].join(''),
+
+  vehicle: [
+    '<div class="form-group"><label>Vehicle Name *</label><input class="form-control" id="f_name" placeholder="Toyota Innova Crysta"/></div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Capacity</label><input class="form-control" id="f_capacity" placeholder="6–7 Seats"/></div>',
+      '<div class="form-group"><label>Badge</label><input class="form-control" id="f_badge" placeholder="Premium, Group, Economy…"/></div>',
+    '</div>',
+    '<div class="form-group"><label>Specs <small style="font-weight:400;text-transform:none">(comma separated)</small></label><input class="form-control" id="f_specsRaw" placeholder="AC, GPS, Music System, 4x4"/></div>',
+    '<div class="form-group"><label>Image URL</label><input class="form-control" id="f_image" placeholder="https://images.unsplash.com/photo-…"/></div>',
+    '<div class="form-group"><label>Description</label><textarea class="form-control" id="f_description" rows="3"></textarea></div>',
+  ].join(''),
+
+  gallery: [
+    '<div class="form-group"><label>Image URL *</label><input class="form-control" id="f_url" placeholder="https://images.unsplash.com/photo-…"/></div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Caption</label><input class="form-control" id="f_caption" placeholder="Gulmarg Snow, Dal Lake Sunrise…"/></div>',
+      '<div class="form-group"><label>Category</label><select class="form-control" id="f_category">',
+        '<option value="gulmarg">Gulmarg</option>',
+        '<option value="pahalgam">Pahalgam</option>',
+        '<option value="sonamarg">Sonamarg</option>',
+        '<option value="dal-lake">Dal Lake</option>',
+        '<option value="winter">Winter</option>',
+        '<option value="all">General</option>',
+      '</select></div>',
+    '</div>',
+  ].join(''),
+
+  testimonial: [
+    '<div class="form-row">',
+      '<div class="form-group"><label>Author Name *</label><input class="form-control" id="f_author" placeholder="Rahul Sharma"/></div>',
+      '<div class="form-group"><label>Location / Package</label><input class="form-control" id="f_location" placeholder="Delhi · Honeymoon Package"/></div>',
+    '</div>',
+    '<div class="form-row">',
+      '<div class="form-group"><label>Rating (1–5)</label><input class="form-control" id="f_rating" type="number" min="1" max="5" value="5"/></div>',
+      '<div class="form-group"><label>Avatar URL <small style="font-weight:400;text-transform:none">(optional)</small></label><input class="form-control" id="f_avatar" placeholder="https://images.unsplash.com/…"/></div>',
+    '</div>',
+    '<div class="form-group"><label>Review Text *</label><textarea class="form-control" id="f_review" rows="4" placeholder="What the traveller said about their experience…"></textarea></div>',
+  ].join(''),
+};
+
+// map collection names → modal type names
+var COL_TO_TYPE = {
+  tours:'tour', destinations:'destination', vehicles:'vehicle',
+  gallery:'gallery', testimonials:'testimonial'
+};
+var TYPE_TO_COL = {
+  tour:'tours', destination:'destinations', vehicle:'vehicles',
+  gallery:'gallery', testimonial:'testimonials'
+};
+
+var _mType   = null;
+var _mEditId = null;
+var _mEditCol= null;
+
+function openModal(type, prefillData) {
+  // Store edit context FIRST before anything else
+  // (editItem sets _mEditId/_mEditCol before calling openModal)
+  _mType = type;
+  var title = ((_mEditId ? 'Edit ' : 'Add ') + type.charAt(0).toUpperCase() + type.slice(1));
+  document.getElementById('moTitle').textContent = title;
+
+  // Render the form HTML
+  document.getElementById('moBody').innerHTML = FORMS[type] || '<p>Unknown type: '+type+'</p>';
+
+  // Pre-fill fields if editing — AFTER rendering form HTML
+  if (prefillData) {
+    // Fill each matching input/textarea/select
+    var fields = ['name','tagline','category','price','duration','groupSize','badge','image',
+                  'description','altitude','distance','bestSeason','capacity',
+                  'url','caption','author','location','rating','avatar','review'];
+    fields.forEach(function(key) {
+      var el = document.getElementById('f_'+key);
+      if (!el) return;
+      var val = prefillData[key];
+      if (val !== undefined && val !== null) el.value = val;
+    });
+    // Special: specs array → comma string
+    if (prefillData.specs && Array.isArray(prefillData.specs)) {
+      var sp = document.getElementById('f_specsRaw');
+      if (sp) sp.value = prefillData.specs.join(', ');
+    }
+    // Special: select elements need matched option
+    ['f_category'].forEach(function(selId) {
+      var sel = document.getElementById(selId);
+      if (!sel) return;
+      var fieldKey = selId.replace('f_','');
+      var val = prefillData[fieldKey];
+      if (!val) return;
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === val || sel.options[i].text === val) {
+          sel.selectedIndex = i; break;
+        }
+      }
+    });
+  }
+
   document.getElementById('modal').classList.add('open');
 }
 window.openModal = openModal;
 
 window.editItem = function(col, id) {
   db.collection(col).doc(id).get().then(function(snap) {
-    if (!snap.exists) return;
-    var typeMap = {tours:'tour',destinations:'destination',vehicles:'vehicle',gallery:'gallery',testimonials:'testimonial'};
-    _mEditId = id; _mEditCol = col;
-    openModal(typeMap[col] || col, snap.data());
-    document.getElementById('moTitle').textContent = 'Edit ' + (typeMap[col] || col);
-  }).catch(function(){ alert('Failed to load item.'); });
+    if (!snap.exists) { alert('Item not found.'); return; }
+    var type = COL_TO_TYPE[col];
+    if (!type) { alert('Unknown collection: '+col); return; }
+    // Set edit context BEFORE calling openModal
+    _mEditId  = id;
+    _mEditCol = col;
+    openModal(type, snap.data());
+  }).catch(function(err) { alert('Failed to load: '+err.message); });
 };
 
-document.getElementById('moCancelBtn').onclick = function() { document.getElementById('modal').classList.remove('open'); };
-document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+document.getElementById('moCancelBtn').onclick = closeModal;
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  _mType    = null;
+  _mEditId  = null;
+  _mEditCol = null;
+}
+
+// ── SAVE (Add / Update) ──────────────────────────────────
 document.getElementById('moSaveBtn').addEventListener('click', function() {
-  var g = function(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
-  var data = {}, colName = '';
+  if (!_mType) return;
+  var g = function(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  };
+
+  var data    = null;
+  var colName = TYPE_TO_COL[_mType];
+
   if (_mType === 'tour') {
-    if (!g('f_name') || !g('f_price')) { alert('Name and Price are required.'); return; }
-    data = {name:g('f_name'),category:g('f_category'),price:Number(g('f_price')),duration:g('f_duration'),groupSize:g('f_groupSize'),badge:g('f_badge'),image:g('f_image'),description:g('f_description')};
-    colName = 'tours';
+    if (!g('f_name')) { alert('Tour name is required.'); return; }
+    if (!g('f_price')) { alert('Price is required.'); return; }
+    data = {
+      name:        g('f_name'),
+      category:    g('f_category'),
+      price:       Number(g('f_price')),
+      duration:    g('f_duration'),
+      groupSize:   g('f_groupSize'),
+      badge:       g('f_badge'),
+      image:       g('f_image'),
+      description: g('f_description')
+    };
+
   } else if (_mType === 'destination') {
-    if (!g('f_name')) { alert('Name required.'); return; }
-    data = {name:g('f_name'),altitude:g('f_altitude'),bestSeason:g('f_bestSeason'),image:g('f_image'),description:g('f_description')};
-    colName = 'destinations';
+    if (!g('f_name')) { alert('Destination name is required.'); return; }
+    data = {
+      name:        g('f_name'),
+      tagline:     g('f_tagline'),
+      altitude:    g('f_altitude'),
+      distance:    g('f_distance'),
+      bestSeason:  g('f_bestSeason'),
+      image:       g('f_image'),
+      description: g('f_description')
+    };
+
   } else if (_mType === 'vehicle') {
-    if (!g('f_name')) { alert('Name required.'); return; }
-    var specs = g('f_specsRaw') ? g('f_specsRaw').split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
-    data = {name:g('f_name'),capacity:g('f_capacity'),badge:g('f_badge'),specs:specs,image:g('f_image'),description:g('f_description')};
-    colName = 'vehicles';
+    if (!g('f_name')) { alert('Vehicle name is required.'); return; }
+    var specsRaw = g('f_specsRaw');
+    var specs    = specsRaw ? specsRaw.split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+    data = {
+      name:        g('f_name'),
+      capacity:    g('f_capacity'),
+      badge:       g('f_badge'),
+      specs:       specs,
+      image:       g('f_image'),
+      description: g('f_description')
+    };
+
   } else if (_mType === 'gallery') {
-    if (!g('f_url')) { alert('Image URL required.'); return; }
-    data = {url:g('f_url'),caption:g('f_caption'),category:g('f_category')};
-    colName = 'gallery';
+    if (!g('f_url')) { alert('Image URL is required.'); return; }
+    data = {
+      url:      g('f_url'),
+      caption:  g('f_caption'),
+      category: g('f_category') || 'all'
+    };
+
   } else if (_mType === 'testimonial') {
-    if (!g('f_author') || !g('f_review')) { alert('Author and review required.'); return; }
-    data = {author:g('f_author'),location:g('f_location'),rating:parseInt(g('f_rating'))||5,avatar:g('f_avatar'),review:g('f_review')};
-    colName = 'testimonials';
+    if (!g('f_author')) { alert('Author name is required.'); return; }
+    if (!g('f_review')) { alert('Review text is required.'); return; }
+    data = {
+      author:   g('f_author'),
+      location: g('f_location'),
+      rating:   parseInt(g('f_rating')) || 5,
+      avatar:   g('f_avatar'),
+      review:   g('f_review')
+    };
   }
+
+  if (!data) return;
+
   var btn = document.getElementById('moSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
-  var done = function() { btn.disabled = false; btn.textContent = 'Save'; document.getElementById('modal').classList.remove('open'); };
+
+  var done = function() {
+    btn.disabled = false; btn.textContent = 'Save';
+    closeModal();
+  };
+
   if (_mEditId && _mEditCol) {
+    // UPDATE
     data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    db.collection(_mEditCol).doc(_mEditId).update(data).then(function(){ showToast('Updated!','success'); loadTable(_mEditCol); done(); }).catch(function(){ showToast('Save failed.','error'); done(); });
+    db.collection(_mEditCol).doc(_mEditId).update(data)
+      .then(function(){
+        showToast('✓ Updated successfully!', 'success');
+        loadTable(_mEditCol);
+        done();
+      })
+      .catch(function(err){
+        showToast('Save failed: ' + err.message, 'error');
+        btn.disabled = false; btn.textContent = 'Save';
+      });
   } else {
+    // CREATE
     data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    db.collection(colName).add(data).then(function(){ showToast('Added!','success'); loadTable(colName); done(); }).catch(function(){ showToast('Save failed.','error'); done(); });
+    db.collection(colName).add(data)
+      .then(function(){
+        showToast('✓ Added successfully!', 'success');
+        loadTable(colName);
+        done();
+      })
+      .catch(function(err){
+        showToast('Save failed: ' + err.message, 'error');
+        btn.disabled = false; btn.textContent = 'Save';
+      });
   }
 });
 
+// ── TOAST ────────────────────────────────────────────────
 function showToast(msg, type) {
   var t = document.getElementById('adminToast');
-  if (!t) { t = document.createElement('div'); t.id = 'adminToast'; Object.assign(t.style,{position:'fixed',bottom:'2rem',left:'50%',transform:'translateX(-50%) translateY(80px)',padding:'.85rem 2rem',borderRadius:'100px',fontSize:'.88rem',zIndex:'99999',boxShadow:'0 8px 24px rgba(0,0,0,.2)',transition:'transform .4s',fontFamily:"'Jost',sans-serif",whiteSpace:'nowrap',color:'#fff'}); document.body.appendChild(t); }
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'adminToast';
+    Object.assign(t.style, {
+      position:'fixed', bottom:'2rem', left:'50%',
+      transform:'translateX(-50%) translateY(80px)',
+      padding:'.85rem 2rem', borderRadius:'100px',
+      fontSize:'.88rem', zIndex:'99999',
+      boxShadow:'0 8px 24px rgba(0,0,0,.25)',
+      transition:'transform .4s cubic-bezier(.4,0,.2,1)',
+      fontFamily:"'Jost',sans-serif", whiteSpace:'nowrap',
+      color:'#fff'
+    });
+    document.body.appendChild(t);
+  }
   t.textContent = msg;
   t.style.background = type === 'success' ? 'var(--green)' : '#b43232';
-  t.style.transform = 'translateX(-50%) translateY(0)';
-  setTimeout(function(){t.style.transform='translateX(-50%) translateY(80px)';},3000);
+  t.style.transform  = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.transform = 'translateX(-50%) translateY(80px)'; }, 3200);
+}
 }
 </script>
 </body>
