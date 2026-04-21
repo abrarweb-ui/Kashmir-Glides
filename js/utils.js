@@ -3,12 +3,12 @@
 window.KG = {
   // Firebase config — replace with your actual values
   firebaseConfig: {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCdcQ9Rl4kxCJPeXIiRSdhB0rGN0OlmQAw",
+  authDomain: "kashmir-glides.firebaseapp.com",
+  projectId: "kashmir-glides",
+  storageBucket: "kashmir-glides.firebasestorage.app",
+  messagingSenderId: "542165837541",
+  appId: "1:542165837541:web:aecbc8801b1b943a10d60c"
   },
 
   initHeader: function() {
