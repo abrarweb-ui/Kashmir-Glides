@@ -25,7 +25,7 @@
 <body>
 <div id="header-placeholder"></div>
 <div class="page-hero">
-  <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1715457573748-8e8a70b2c1be?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D=80')"></div>
+  <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1685716271205-83a5ac2ba63b?q=80&w=1400&auto=format&fit=crop')"></div>
   <div class="page-hero-overlay"></div>
   <div class="page-hero-content"><h1>Book a Tour</h1>
     <div class="breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">›</span><span>Book a Tour</span></div>
@@ -180,34 +180,21 @@ document.getElementById('bookBtn').addEventListener('click', function() {
   var btn = document.getElementById('bookBtn');
   btn.disabled = true; btn.textContent = 'Submitting…';
 
-  function doSave() {
-    try {
-      if (!firebase.apps.length) firebase.initializeApp(window.KG.firebaseConfig);
-      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      firebase.firestore().collection('bookings').add(data).then(function() {
-        msgDiv.innerHTML = '<div class="alert alert-success">✓ Booking request submitted! Our team will contact you within 2 hours.</div>';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        ['bName','bPhone','bEmail','bCity','bDate','bReturn','bAdults','bChildren','bMsg'].forEach(function(id) { document.getElementById(id).value = ''; });
-        document.querySelectorAll('.dest-checks input').forEach(function(el) { el.checked = false; });
-        btn.disabled = false; btn.textContent = 'Submit Booking Request';
-      }).catch(fallback);
-    } catch(e) { fallback(); }
-  }
-
   function fallback() {
     msgDiv.innerHTML = '<div class="alert alert-error">Could not submit. Please WhatsApp us at +91 9149606265 or call 9103563313.</div>';
     btn.disabled = false; btn.textContent = 'Submit Booking Request';
   }
 
-  var cfg = window.KG.firebaseConfig;
-  if (!cfg || cfg.apiKey === 'YOUR_API_KEY') { fallback(); return; }
-  if (typeof firebase !== 'undefined' && firebase.firestore) { doSave(); return; }
-  var s1 = document.createElement('script'); s1.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
-  s1.onload = function() {
-    var s2 = document.createElement('script'); s2.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js';
-    s2.onload = doSave; s2.onerror = fallback; document.head.appendChild(s2);
-  };
-  s1.onerror = fallback; document.head.appendChild(s1);
+  KG.initFirebase(function(db) {
+    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    db.collection('bookings').add(data).then(function() {
+      msgDiv.innerHTML = '<div class="alert alert-success">✓ Booking request submitted! Our team will contact you within 2 hours.</div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      ['bName','bPhone','bEmail','bCity','bDate','bReturn','bAdults','bChildren','bMsg'].forEach(function(id) { document.getElementById(id).value = ''; });
+      document.querySelectorAll('.dest-checks input').forEach(function(el) { el.checked = false; });
+      btn.disabled = false; btn.textContent = 'Submit Booking Request';
+    }).catch(function() { fallback(); });
+  }, function() { fallback(); });
 });
 </script>
 </body>
