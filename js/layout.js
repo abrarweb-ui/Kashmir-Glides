@@ -18,6 +18,7 @@ window.KG_LAYOUT = {
       <a href="index.html" class="nav-link">Home</a>
       <a href="about.html" class="nav-link">About</a>
       <a href="tours.html" class="nav-link">Tours</a>
+      <a href="destinations.html" class="nav-link">Destinations</a>
       <a href="vehicles.html" class="nav-link">Vehicles</a>
       <a href="gallery.html" class="nav-link">Gallery</a>
       <a href="contact.html" class="nav-link">Contact</a>
@@ -38,6 +39,7 @@ window.KG_LAYOUT = {
   <a href="index.html" class="nav-link">Home</a>
   <a href="about.html" class="nav-link">About</a>
   <a href="tours.html" class="nav-link">Tours</a>
+  <a href="destinations.html" class="nav-link">Destinations</a>
   <a href="vehicles.html" class="nav-link">Vehicles</a>
   <a href="gallery.html" class="nav-link">Gallery</a>
   <a href="contact.html" class="nav-link">Contact</a>
@@ -90,9 +92,23 @@ window.KG_LAYOUT = {
         <a href="index.html">Home</a>
         <a href="about.html">About Us</a>
         <a href="tours.html">Tour Packages</a>
+        <a href="destinations.html">Destinations</a>
         <a href="vehicles.html">Our Vehicles</a>
         <a href="gallery.html">Gallery</a>
         <a href="book.html">Book a Tour</a>
+      </nav>
+    </div>
+    <div>
+      <h4 class="footer-heading">Explore</h4>
+      <nav class="footer-links">
+        <a href="destinations.html#gulmarg">Gulmarg</a>
+        <a href="destinations.html#pahalgam">Pahalgam</a>
+        <a href="destinations.html#sonamarg">Sonamarg</a>
+        <a href="destinations.html#dal-lake">Dal Lake</a>
+        <a href="destinations.html#tangmarg">Tangmarg</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
       </nav>
     </div>
     <div>
