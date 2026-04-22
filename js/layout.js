@@ -24,7 +24,7 @@ window.KG_LAYOUT = {
       <a href="contact.html" class="nav-link">Contact</a>
     </nav>
     <div class="header-cta">
-      <a href="tel:9103563313" class="btn-call">
+      <a href="tel:9149606265" class="btn-call">
         <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
         Call Now
       </a>
@@ -45,7 +45,7 @@ window.KG_LAYOUT = {
   <a href="contact.html" class="nav-link">Contact</a>
   <a href="book.html" class="btn-primary" style="margin-top:1rem;text-align:center">Book a Tour</a>
   <div style="margin-top:1rem;display:flex;gap:1.5rem;padding:.75rem 0">
-    <a href="tel:9103563313" style="font-size:.88rem;color:var(--green);font-weight:500">📞 9103563313</a>
+    <a href="tel:9149606265" style="font-size:.88rem;color:var(--green);font-weight:500">📞 9149606265</a>
     <a href="https://wa.me/919149606265" style="font-size:.88rem;color:var(--green);font-weight:500" target="_blank">💬 WhatsApp</a>
   </div>
 </nav>`;
