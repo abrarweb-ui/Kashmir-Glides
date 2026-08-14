@@ -134,7 +134,13 @@ window.KG_LAYOUT = {
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 Kashmir Glide Tour &amp; Travels. All rights reserved.</span>
+   <span>
+  © 2025 Kashmir Glide Tour &amp; Travels. All rights reserved.
+  Developed by
+  <a href="https://abrartallks-portfolio.co.in/" target="_blank" rel="noopener">
+    Abrarr Talks
+  </a>
+</span>
     <div class="footer-bottom-links">
       <a href="privacy-policy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>
